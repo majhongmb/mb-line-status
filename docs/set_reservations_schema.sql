@@ -1,0 +1,64 @@
+create extension if not exists pgcrypto;
+
+create table if not exists public.set_reservations (
+  id uuid primary key default gen_random_uuid(),
+  date date not null,
+  start_time time not null,
+  game_type text not null check (game_type in ('sanma', 'yonma', 'other')),
+  duration_minutes integer check (duration_minutes is null or duration_minutes in (180, 240, 300)),
+  people_count integer not null check (people_count in (4, 5, 6)),
+  customer_name text not null,
+  contact text not null,
+  notes text,
+  status text not null default 'pending' check (status in ('pending', 'confirmed', 'cancelled')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists set_reservations_set_updated_at on public.set_reservations;
+create trigger set_reservations_set_updated_at
+before update on public.set_reservations
+for each row execute function public.set_updated_at();
+
+create index if not exists set_reservations_date_start_time_idx
+  on public.set_reservations(date, start_time);
+
+create index if not exists set_reservations_status_date_idx
+  on public.set_reservations(status, date);
+
+alter table public.set_reservations enable row level security;
+
+drop policy if exists "anon insert set_reservations" on public.set_reservations;
+create policy "anon insert set_reservations"
+on public.set_reservations for insert to anon
+with check (status = 'pending');
+
+drop policy if exists "anon read set_reservations" on public.set_reservations;
+create policy "anon read set_reservations"
+on public.set_reservations for select to anon
+using (true);
+
+drop policy if exists "anon update set_reservations" on public.set_reservations;
+create policy "anon update set_reservations"
+on public.set_reservations for update to anon
+using (true)
+with check (status in ('pending', 'confirmed', 'cancelled'));
+
+drop policy if exists "authenticated manage set_reservations" on public.set_reservations;
+create policy "authenticated manage set_reservations"
+on public.set_reservations for all to authenticated
+using (true)
+with check (true);
+
+grant select, insert, update on public.set_reservations to anon;
+grant select, insert, update, delete on public.set_reservations to authenticated;

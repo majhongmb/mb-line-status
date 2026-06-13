@@ -79,6 +79,13 @@ export default function Home() {
             <span className="choice-sub">グループ利用の空きを確認</span>
           </span>
         </button>
+
+        <a className="reserve-entry-button" href="/reserve">
+          <span className="reserve-entry-text">
+            <span className="reserve-entry-main">予約リクエスト</span>
+            <span className="reserve-entry-sub">セット利用の希望日時を送る</span>
+          </span>
+        </a>
       </section>
 
       <footer className="page-footer">フリー・セットの受付状況を確認できます</footer>
@@ -103,6 +110,11 @@ export default function Home() {
                 <h1>{selected.title}</h1>
                 <p>{selected.message}</p>
                 <div className="updated">更新 {status?.asOf}</div>
+                {mode === "set" && selected.level === "available" ? (
+                  <a className="reserve-link-button" href="/reserve">
+                    予約する
+                  </a>
+                ) : null}
                 <button className="close-button" onClick={closeOverlay} type="button">
                   閉じる
                 </button>

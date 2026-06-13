@@ -34,6 +34,8 @@ html, body {
 
 button { font: inherit; cursor: pointer; }
 
+a { color: inherit; text-decoration: none; }
+
 /* ================================================================
    Page shell
    ================================================================ */
@@ -203,6 +205,78 @@ button { font: inherit; cursor: pointer; }
 
 .choice-button-free::before  { background-image: url("/free-button-pop.png"); }
 .choice-button-set::before   { background-image: url("/set-button-pop.png"); }
+
+.reserve-entry-button {
+  position: relative;
+  display: flex;
+  min-height: 86px;
+  align-items: center;
+  overflow: hidden;
+  border: 1.5px solid rgba(200,161,32,.28);
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, rgba(5, 33, 22, .92) 0%, rgba(5, 33, 22, .74) 44%, rgba(5, 33, 22, .28) 100%),
+    url("/reserve-button-illustration.png") center / cover;
+  box-shadow:
+    inset 0 0 0 1px var(--white-glass),
+    0 12px 0 rgba(0,0,0,.36),
+    0 20px 34px rgba(0,0,0,.44);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms cubic-bezier(.2,.8,.4,1);
+}
+
+.reserve-entry-button::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
+}
+
+@media (hover: hover) {
+  .reserve-entry-button:hover {
+    transform: translateY(-2px);
+    border-color: rgba(200,161,32,.55);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.06),
+      0 16px 0 rgba(0,0,0,.32),
+      0 26px 40px rgba(0,0,0,.42),
+      0 0 24px rgba(200,161,32,.14);
+  }
+}
+
+.reserve-entry-button:active {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 0 0 1px var(--white-glass),
+    0 5px 0 rgba(0,0,0,.36),
+    0 10px 20px rgba(0,0,0,.42);
+}
+
+.reserve-entry-text {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 4px;
+  padding: 18px 20px;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0,0,0,.72), 0 1px 2px rgba(0,0,0,.95);
+}
+
+.reserve-entry-main {
+  font-size: 22px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.reserve-entry-sub {
+  color: rgba(240, 232, 208, .82);
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.2;
+}
 
 .choice-text {
   position: relative;
@@ -449,4 +523,162 @@ button { font: inherit; cursor: pointer; }
 
 .close-button:active {
   background: rgba(200,161,32,.40);
+}
+
+.reserve-link-button {
+  display: grid;
+  width: 100%;
+  height: 50px;
+  margin-top: 18px;
+  place-items: center;
+  border: 1.5px solid rgba(78, 232, 158, .34);
+  border-radius: 11px;
+  background: linear-gradient(180deg, rgba(30, 130, 81, .95), rgba(14, 89, 56, .95));
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: .04em;
+  box-shadow: 0 10px 24px rgba(4, 10, 6, .28), 0 0 20px rgba(78, 232, 158, .12);
+}
+
+/* ================================================================
+   Reservation page
+   ================================================================ */
+.reserve-page {
+  min-height: 100svh;
+  padding: max(18px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(200,161,32,.12) 0%, transparent 100%),
+    linear-gradient(160deg, #08150d 0%, #0e2218 58%, #08130d 100%);
+}
+
+.reserve-shell {
+  width: min(100%, 480px);
+  margin: 0 auto;
+}
+
+.reserve-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  color: var(--cream-dim);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.reserve-header {
+  margin: 10px 0 18px;
+}
+
+.reserve-header p {
+  margin: 0 0 5px;
+  color: var(--gold-light);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.reserve-header h1 {
+  margin: 0;
+  color: var(--cream);
+  font-size: 30px;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.reserve-form {
+  display: grid;
+  gap: 13px;
+}
+
+.reserve-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--cream);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.reserve-form input,
+.reserve-form select,
+.reserve-form textarea {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(200,161,32,.28);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .96);
+  color: #102018;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0;
+  padding: 11px 12px;
+}
+
+.reserve-form textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.reserve-submit {
+  min-height: 54px;
+  margin-top: 6px;
+  border: 1px solid rgba(237, 217, 90, .48);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #edd95a 0%, #c8a120 100%);
+  color: #08150d;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.reserve-submit:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.reserve-error {
+  border: 1px solid rgba(255, 106, 88, .36);
+  border-radius: 10px;
+  background: rgba(90, 16, 12, .35);
+  color: #ffb3a8;
+  padding: 11px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.reserve-complete {
+  display: grid;
+  gap: 10px;
+  border: 1.5px solid var(--gold-border);
+  border-radius: 16px;
+  background: rgba(9, 19, 13, 0.96);
+  padding: 26px 22px;
+  box-shadow: 0 24px 52px rgba(0,0,0,.45), inset 0 0 0 1px var(--white-glass);
+}
+
+.reserve-complete strong {
+  color: var(--cream);
+  font-size: 22px;
+  font-weight: 950;
+  line-height: 1.35;
+}
+
+.reserve-complete span {
+  color: var(--cream-dim);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+@media (min-width: 700px) {
+  .reserve-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reserve-full,
+  .reserve-error,
+  .reserve-submit {
+    grid-column: 1 / -1;
+  }
 }
