@@ -141,6 +141,7 @@ export default function ReservePage() {
 
             <label className="reserve-full">
               <FieldLabel>備考</FieldLabel>
+              <span className="reserve-help-text">赤の枚数や持ち点などご希望ございましたらご記入ください。</span>
               <textarea rows={4} value={form.notes} onChange={(event) => update("notes", event.target.value)} />
             </label>
 
