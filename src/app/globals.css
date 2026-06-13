@@ -555,6 +555,7 @@ a { color: inherit; text-decoration: none; }
 .reserve-shell {
   width: min(100%, 480px);
   margin: 0 auto;
+  min-width: 0;
 }
 
 .reserve-back {
@@ -606,6 +607,7 @@ a { color: inherit; text-decoration: none; }
 .reserve-form label {
   display: grid;
   gap: 7px;
+  min-width: 0;
   color: var(--cream);
   font-size: 13px;
   font-weight: 900;
@@ -675,6 +677,8 @@ a { color: inherit; text-decoration: none; }
 .reserve-form select,
 .reserve-form textarea {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 48px;
   border: 1px solid rgba(200,161,32,.28);
   border-radius: 10px;
@@ -685,6 +689,11 @@ a { color: inherit; text-decoration: none; }
   font-weight: 700;
   letter-spacing: 0;
   padding: 11px 12px;
+}
+
+.reserve-form input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .reserve-form textarea {
