@@ -88,16 +88,25 @@ button { font: inherit; cursor: pointer; }
   z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   border: 1.5px solid var(--gold-border);
   border-radius: 999px;
   background: rgba(12, 24, 17, 0.88);
-  padding: 9px 18px 9px 10px;
+  padding: 7px 20px 7px 8px;
   color: var(--cream);
   box-shadow:
     0 0 24px var(--gold-glow),
     0 10px 32px rgba(0,0,0,.5);
   backdrop-filter: blur(14px);
+}
+
+.brand-mark-image {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(200,161,32,.42);
 }
 
 .brand-mark {

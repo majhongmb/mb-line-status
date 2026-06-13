@@ -61,7 +61,7 @@ export default function Home() {
   return (
     <main className="status-page">
       <header className="brand-header">
-        <span className="brand-mark" aria-hidden="true">MB</span>
+        <img alt="" className="brand-mark-image" src="/mb-title-mark.png" />
         <span className="brand-name">麻雀MB</span>
       </header>
 
