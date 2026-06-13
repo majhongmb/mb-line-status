@@ -644,6 +644,33 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.5;
 }
 
+.reserve-availability {
+  border-radius: 10px;
+  padding: 11px 12px;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.55;
+}
+
+.reserve-availability-ok {
+  border: 1px solid rgba(78, 232, 158, .30);
+  background: rgba(16, 88, 54, .32);
+  color: #71f0af;
+}
+
+.reserve-availability-full,
+.reserve-availability-error {
+  border: 1px solid rgba(255, 106, 88, .34);
+  background: rgba(90, 16, 12, .32);
+  color: #ffb3a8;
+}
+
+.reserve-availability-checking {
+  border: 1px solid rgba(237, 217, 90, .22);
+  background: rgba(255, 255, 255, .06);
+  color: rgba(240, 232, 208, .72);
+}
+
 .reserve-form input,
 .reserve-form select,
 .reserve-form textarea {

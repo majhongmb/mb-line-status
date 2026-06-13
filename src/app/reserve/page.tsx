@@ -1,7 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+
+type Availability = {
+  available: boolean;
+  ledgerSetTableCount: number;
+  maxTableCount: number;
+  remainingTableCount: number;
+  reservedTableCount: number;
+  usedTableCount: number;
+};
 
 type FormState = {
   contact: string;
@@ -13,6 +22,7 @@ type FormState = {
   people_count: "" | "4" | "5" | "6";
   customer_name: string;
   start_time: string;
+  table_count: "1" | "2";
 };
 
 const startTimeOptions = buildStartTimeOptions();
@@ -27,6 +37,7 @@ const initialForm: FormState = {
   people_count: "",
   customer_name: "",
   start_time: "",
+  table_count: "1",
 };
 
 export default function ReservePage() {
@@ -34,6 +45,42 @@ export default function ReservePage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [availability, setAvailability] = useState<Availability | null>(null);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState("");
+
+  const requestedTableCount = Number(form.table_count);
+  const cannotReserve =
+    availabilityLoading ||
+    Boolean(availabilityError) ||
+    Boolean(availability && requestedTableCount > availability.remainingTableCount);
+
+  useEffect(() => {
+    if (!form.date) return;
+    const controller = new AbortController();
+    setAvailabilityLoading(true);
+    setAvailabilityError("");
+
+    fetch(`/api/reservation-availability?date=${encodeURIComponent(form.date)}`, {
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data?.error ?? "空き状況を確認できませんでした。");
+        setAvailability(data as Availability);
+      })
+      .catch((caught) => {
+        if (controller.signal.aborted) return;
+        setAvailability(null);
+        setAvailabilityError(caught instanceof Error ? caught.message : "空き状況を確認できませんでした。");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setAvailabilityLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [form.date]);
 
   async function submitReservation(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -127,6 +174,28 @@ export default function ReservePage() {
             </label>
 
             <label>
+              <FieldLabel required>卓数</FieldLabel>
+              <select required value={form.table_count} onChange={(event) => update("table_count", event.target.value as FormState["table_count"])}>
+                <option value="1">1卓</option>
+                <option value="2">2卓</option>
+              </select>
+            </label>
+
+            <div className={`reserve-availability reserve-full ${availabilityStatusClass(availability, availabilityLoading, availabilityError, requestedTableCount)}`}>
+              {availabilityLoading ? (
+                "空き状況を確認中です。"
+              ) : availabilityError ? (
+                availabilityError
+              ) : availability ? (
+                availability.remainingTableCount > 0 && requestedTableCount <= availability.remainingTableCount
+                  ? `この日は予約可能です。残り${availability.remainingTableCount}卓です。`
+                  : "この日は満席です。別日または卓数を変更してください。"
+              ) : (
+                "利用日を選ぶと空き状況を確認できます。"
+              )}
+            </div>
+
+            <label>
               <FieldLabel required>お名前</FieldLabel>
               <input required autoComplete="name" value={form.customer_name} onChange={(event) => update("customer_name", event.target.value)} />
             </label>
@@ -149,7 +218,7 @@ export default function ReservePage() {
 
             {error ? <div className="reserve-error">{error}</div> : null}
 
-            <button className="reserve-submit" disabled={submitting} type="submit">
+            <button className="reserve-submit" disabled={submitting || cannotReserve} type="submit">
               {submitting ? "送信中..." : "予約リクエストを送る"}
             </button>
           </form>
@@ -166,6 +235,15 @@ function FieldLabel({ children, required = false }: { children: ReactNode; requi
       <span className={required ? "reserve-required" : "reserve-optional"}>{required ? "※必須" : "※任意"}</span>
     </span>
   );
+}
+
+function availabilityStatusClass(availability: Availability | null, loading: boolean, error: string, requestedTableCount: number) {
+  if (loading) return "reserve-availability-checking";
+  if (error) return "reserve-availability-error";
+  if (!availability) return "reserve-availability-checking";
+  return availability.remainingTableCount > 0 && requestedTableCount <= availability.remainingTableCount
+    ? "reserve-availability-ok"
+    : "reserve-availability-full";
 }
 
 function buildStartTimeOptions() {

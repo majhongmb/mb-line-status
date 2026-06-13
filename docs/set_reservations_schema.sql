@@ -7,6 +7,7 @@ create table if not exists public.set_reservations (
   game_type text not null check (game_type in ('sanma', 'yonma', 'other')),
   duration_minutes integer check (duration_minutes is null or duration_minutes in (180, 240, 300)),
   people_count integer check (people_count is null or people_count in (4, 5, 6)),
+  table_count integer not null default 1 check (table_count in (1, 2)),
   customer_name text not null,
   contact text not null,
   email text not null,
@@ -19,11 +20,24 @@ create table if not exists public.set_reservations (
 alter table public.set_reservations
   add column if not exists email text;
 
+update public.set_reservations
+set email = ''
+where email is null;
+
 alter table public.set_reservations
   alter column email set not null;
 
 alter table public.set_reservations
   alter column people_count drop not null;
+
+alter table public.set_reservations
+  add column if not exists table_count integer not null default 1;
+
+alter table public.set_reservations
+  drop constraint if exists set_reservations_table_count_check;
+
+alter table public.set_reservations
+  add constraint set_reservations_table_count_check check (table_count in (1, 2));
 
 create or replace function public.set_updated_at()
 returns trigger
