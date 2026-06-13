@@ -128,21 +128,21 @@ button { font: inherit; cursor: pointer; }
   position: relative;
   z-index: 1;
   display: grid;
-  width: min(100%, 340px);
-  gap: 14px;
+  width: min(100%, 380px);
+  gap: 16px;
 }
 
 .choice-button {
   position: relative;
   display: flex;
-  min-height: 164px;
+  min-height: clamp(176px, 23svh, 214px);
   width: 100%;
   align-items: flex-end;
   justify-content: flex-start;
   overflow: hidden;
   border: 1.5px solid var(--gold-border);
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 22px;
   text-align: left;
 
   box-shadow:
@@ -176,8 +176,8 @@ button { font: inherit; cursor: pointer; }
   background: linear-gradient(
     180deg,
     rgba(0,0,0,.08) 0%,
-    rgba(0,0,0,.18) 40%,
-    rgba(0,0,0,.68) 100%
+    rgba(0,0,0,.16) 36%,
+    rgba(0,0,0,.74) 100%
   );
 }
 
@@ -220,14 +220,14 @@ button { font: inherit; cursor: pointer; }
 }
 
 .choice-main {
-  font-size: 36px;
+  font-size: 39px;
   font-weight: 950;
   line-height: 1;
   letter-spacing: .02em;
 }
 
 .choice-sub {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: .06em;
   opacity: .88;
