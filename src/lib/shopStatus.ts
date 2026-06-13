@@ -55,6 +55,8 @@ export type PublicStatus = {
 const japanTimeZone = "Asia/Tokyo";
 const interruptedLogNote = "interrupted";
 const tableBreakLogNote = "table_break";
+const businessOpenMinutes = 15 * 60;
+const businessCloseMinutes = 24 * 60;
 
 export function buildPublicStatus(tables: TableBundle[], now = new Date(), setTableCount: number | null = null): PublicStatus {
   const date = todayLedgerDate(now);
@@ -73,15 +75,15 @@ export function buildPublicStatus(tables: TableBundle[], now = new Date(), setTa
         activeSanmaTables: 0,
         activeTables: 0,
         level: "ask",
-        message: "現在は営業時間外です。営業時間中にあらためてご確認ください。",
-        title: "営業時間外です",
+        message: "現在は時間外です。空き確認は15:00〜24:00の間にご利用ください。",
+        title: "時間外です",
       },
       isOpen,
       set: {
         level: "ask",
-        message: "現在は営業時間外です。ご予約・お問い合わせはLINEトークからお願いします。",
+        message: "現在は時間外です。空き確認は15:00〜24:00の間にご利用ください。",
         tableCount: setTableCount,
-        title: "営業時間外です",
+        title: "時間外です",
       },
     };
   }
@@ -214,8 +216,8 @@ export function todayLedgerDate(now = new Date()) {
 
 function isWithinBusinessHours(now: Date) {
   const minutes = currentJapanMinutes(now);
-  const open = Number(process.env.SHOP_OPEN_MINUTES ?? 720);
-  const close = Number(process.env.SHOP_CLOSE_MINUTES ?? 1500);
+  const open = businessOpenMinutes;
+  const close = businessCloseMinutes;
 
   if (close > 1440) {
     return minutes >= open || minutes < close - 1440;
