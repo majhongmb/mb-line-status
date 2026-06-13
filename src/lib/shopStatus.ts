@@ -120,7 +120,7 @@ export function buildPublicStatus(tables: TableBundle[], now = new Date()): Publ
       activeSanmaTables: activeSanmaTables.length,
       activeTables: activeTables.length,
       level: "possible",
-      message: "三麻1卓が進行中です。現在メンバー2入りです。LINEで一度ご確認ください。",
+      message: "三麻1卓が進行中です。メンバー2入りのため、すぐご案内できる可能性があります。",
       title: "入れる可能性あり",
     };
   } else if (activeSanmaTables.length >= 2 && sanmaStaffCount === 1) {
@@ -136,7 +136,7 @@ export function buildPublicStatus(tables: TableBundle[], now = new Date()): Publ
       activeSanmaTables: activeSanmaTables.length,
       activeTables: activeTables.length,
       level: "possible",
-      message: "三麻2卓が進行中です。現在メンバー2入りです。LINEで一度ご確認ください。",
+      message: "三麻2卓が進行中です。メンバー2入りのため、ご案内できる可能性があります。",
       title: "入れる可能性あり",
     };
   } else {
