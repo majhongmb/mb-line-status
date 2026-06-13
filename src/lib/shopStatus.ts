@@ -48,6 +48,7 @@ export type PublicStatus = {
     level: "ask" | "available" | "full";
     title: string;
     message: string;
+    tableCount: number | null;
   };
 };
 
@@ -55,7 +56,7 @@ const japanTimeZone = "Asia/Tokyo";
 const interruptedLogNote = "interrupted";
 const tableBreakLogNote = "table_break";
 
-export function buildPublicStatus(tables: TableBundle[], now = new Date()): PublicStatus {
+export function buildPublicStatus(tables: TableBundle[], now = new Date(), setTableCount: number | null = null): PublicStatus {
   const date = todayLedgerDate(now);
   const asOf = new Intl.DateTimeFormat("ja-JP", {
     hour: "2-digit",
@@ -79,6 +80,7 @@ export function buildPublicStatus(tables: TableBundle[], now = new Date()): Publ
       set: {
         level: "ask",
         message: "現在は営業時間外です。ご予約・お問い合わせはLINEトークからお願いします。",
+        tableCount: setTableCount,
         title: "営業時間外です",
       },
     };
@@ -154,11 +156,43 @@ export function buildPublicStatus(tables: TableBundle[], now = new Date()): Publ
     date,
     free,
     isOpen,
-    set: {
+    set: buildSetStatus(setTableCount),
+  };
+}
+
+function buildSetStatus(setTableCount: number | null): PublicStatus["set"] {
+  if (setTableCount === null) {
+    return {
       level: "ask",
       message: "セットの空き状況は現在確認中です。ご予約はこのLINEトークからお願いします。",
+      tableCount: null,
       title: "LINEで確認してください",
-    },
+    };
+  }
+
+  if (setTableCount >= 2) {
+    return {
+      level: "full",
+      message: "現在セットは2卓入っています。空きがありません。",
+      tableCount: 2,
+      title: "セット空きなし",
+    };
+  }
+
+  if (setTableCount === 1) {
+    return {
+      level: "available",
+      message: "現在セットは1卓入っています。空きはありますが、ご来店前のご予約がおすすめです。",
+      tableCount: 1,
+      title: "セット空きあります",
+    };
+  }
+
+  return {
+    level: "available",
+    message: "現在セットは空いています。このトーク画面からご予約できます。",
+    tableCount: 0,
+    title: "セット空きあります",
   };
 }
 

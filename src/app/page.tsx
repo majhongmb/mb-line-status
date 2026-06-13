@@ -18,6 +18,7 @@ type Status = {
   set: {
     level: "ask" | "available" | "full";
     message: string;
+    tableCount: number | null;
     title: string;
   };
 };

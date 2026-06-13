@@ -17,13 +17,14 @@ export async function GET() {
 
     if (tableError) throw tableError;
 
+    const dailyRecord = await loadDailyRecord(supabase, date);
     const tables = (tableRows ?? []) as LedgerTable[];
     const tableIds = tables.map((table) => table.id);
     const logRows = await loadLogs(supabase, tableIds);
     const seatRows = await loadSeats(supabase, logRows.map((log) => log.id));
     const bundles = buildBundles(tables, logRows, seatRows);
 
-    return NextResponse.json(buildPublicStatus(bundles), {
+    return NextResponse.json(buildPublicStatus(bundles, new Date(), dailyRecord?.set_table_count ?? null), {
       headers: {
         "Cache-Control": "no-store",
       },
@@ -36,6 +37,21 @@ export async function GET() {
       },
     });
   }
+}
+
+async function loadDailyRecord(supabase: ReturnType<typeof createSupabaseServerClient>, date: string) {
+  const { data, error } = await supabase
+    .from("daily_records")
+    .select("set_table_count")
+    .eq("date", date)
+    .maybeSingle();
+
+  if (error) {
+    console.warn("Failed to load daily set table count", error);
+    return null;
+  }
+
+  return { set_table_count: data?.set_table_count ?? 0 };
 }
 
 async function loadLogs(supabase: ReturnType<typeof createSupabaseServerClient>, tableIds: string[]) {
@@ -93,6 +109,7 @@ function buildFallbackStatus(): PublicStatus {
     set: {
       level: "ask",
       message: "セットの空き状況は、このLINEトークからお問い合わせください。",
+      tableCount: null,
       title: "LINEで確認してください",
     },
   };
