@@ -87,6 +87,7 @@ export function buildPublicStatus(tables: TableBundle[], now = new Date()): Publ
   const activeTables = tables.filter(isActiveTable);
   const activeSanmaTables = activeTables.filter((table) => table.game_type === 3);
   const availableSanmaTable = activeSanmaTables.find((table) => staffCountInLatestLog(table) === 1);
+  const twoStaffSanmaTable = activeSanmaTables.find((table) => staffCountInLatestLog(table) >= 2);
 
   let free: PublicStatus["free"];
 
@@ -97,6 +98,14 @@ export function buildPublicStatus(tables: TableBundle[], now = new Date()): Publ
       level: "available",
       message: "三麻1卓、すぐご案内できる可能性があります。来店前にLINEで一言いただけると確実です。",
       title: "フリー案内できます",
+    };
+  } else if (twoStaffSanmaTable) {
+    free = {
+      activeSanmaTables: activeSanmaTables.length,
+      activeTables: activeTables.length,
+      level: "possible",
+      message: "三麻卓が進行中です。メンバー2入りのため、入れ替わりでご案内できる場合があります。来店前にLINEで確認してください。",
+      title: "入れる可能性あり",
     };
   } else if (activeTables.length === 0) {
     free = {
