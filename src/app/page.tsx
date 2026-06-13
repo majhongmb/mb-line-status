@@ -68,14 +68,14 @@ export default function Home() {
         <button className="choice-button choice-button-free" disabled={loading} onClick={() => check("free")} type="button">
           <span className="choice-text">
             <span className="choice-main">フリー</span>
-            <span className="choice-sub">入れるか確認</span>
+            <span className="choice-sub">おひとり様から参加OK</span>
           </span>
         </button>
 
         <button className="choice-button choice-button-set" disabled={loading} onClick={() => check("set")} type="button">
           <span className="choice-text">
             <span className="choice-main">セット</span>
-            <span className="choice-sub">空きを確認</span>
+            <span className="choice-sub">グループ利用の空きを確認</span>
           </span>
         </button>
       </section>
