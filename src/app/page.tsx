@@ -101,12 +101,6 @@ export default function Home() {
                 <div className={`result-badge result-badge-${selected.level}`}>{badgeLabel(selected.level)}</div>
                 <h1>{selected.title}</h1>
                 <p>{selected.message}</p>
-                {mode === "free" && status ? (
-                  <div className="table-counts">
-                    <span>フリー {status.free.activeTables}卓</span>
-                    <span>三麻 {status.free.activeSanmaTables}卓</span>
-                  </div>
-                ) : null}
                 <div className="updated">更新 {status?.asOf}</div>
                 <button className="close-button" onClick={closeOverlay} type="button">
                   閉じる

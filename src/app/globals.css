@@ -412,28 +412,6 @@ button { font: inherit; cursor: pointer; }
 }
 
 /* ================================================================
-   Table counts
-   ================================================================ */
-.table-counts {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.table-counts span {
-  flex: 1;
-  border-radius: 10px;
-  background: var(--gold-dim);
-  border: 1px solid var(--gold-border);
-  padding: 12px 8px;
-  text-align: center;
-  color: var(--gold-light);
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: .04em;
-}
-
-/* ================================================================
    Updated time
    ================================================================ */
 .updated {

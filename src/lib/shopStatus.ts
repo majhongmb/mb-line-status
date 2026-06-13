@@ -86,34 +86,58 @@ export function buildPublicStatus(tables: TableBundle[], now = new Date()): Publ
 
   const activeTables = tables.filter(isActiveTable);
   const activeSanmaTables = activeTables.filter((table) => table.game_type === 3);
-  const availableSanmaTable = activeSanmaTables.find((table) => staffCountInLatestLog(table) === 1);
-  const twoStaffSanmaTable = activeSanmaTables.find((table) => staffCountInLatestLog(table) >= 2);
+  const sanmaStaffCount = activeSanmaTables.reduce((sum, table) => sum + staffCountInLatestLog(table), 0);
+  const sanmaCustomerCount = activeSanmaTables.reduce((sum, table) => sum + customerCountInLatestLog(table), 0);
 
   let free: PublicStatus["free"];
 
-  if (availableSanmaTable) {
+  if (activeSanmaTables.length === 0) {
+    free = {
+      activeSanmaTables: 0,
+      activeTables: activeTables.length,
+      level: "possible",
+      message: "現在フリー卓は立っていません。メンバー2入りでご案内できます。",
+      title: "立卓できます",
+    };
+  } else if (activeSanmaTables.length === 1 && sanmaCustomerCount >= 3) {
+    free = {
+      activeSanmaTables: activeSanmaTables.length,
+      activeTables: activeTables.length,
+      level: "possible",
+      message: "1卓目はお客様3名で進行中です。2卓目をメンバー2入りで立卓できます。",
+      title: "2卓目立卓できます",
+    };
+  } else if (activeSanmaTables.length === 1 && sanmaStaffCount === 1) {
     free = {
       activeSanmaTables: activeSanmaTables.length,
       activeTables: activeTables.length,
       level: "available",
-      message: "三麻1卓、すぐご案内できる可能性があります。来店前にLINEで一言いただけると確実です。",
+      message: "三麻1卓が進行中です。メンバー1入りのため、すぐご案内できる可能性があります。",
       title: "フリー案内できます",
     };
-  } else if (twoStaffSanmaTable) {
+  } else if (activeSanmaTables.length === 1 && sanmaStaffCount >= 2) {
     free = {
       activeSanmaTables: activeSanmaTables.length,
       activeTables: activeTables.length,
       level: "possible",
-      message: "三麻卓が進行中です。メンバー2入りのため、入れ替わりでご案内できる場合があります。来店前にLINEで確認してください。",
+      message: "三麻1卓が進行中です。現在メンバー2入りです。LINEで一度ご確認ください。",
       title: "入れる可能性あり",
     };
-  } else if (activeTables.length === 0) {
+  } else if (activeSanmaTables.length >= 2 && sanmaStaffCount === 1) {
     free = {
-      activeSanmaTables: 0,
-      activeTables: 0,
+      activeSanmaTables: activeSanmaTables.length,
+      activeTables: activeTables.length,
+      level: "available",
+      message: "三麻2卓が進行中です。メンバー1入りのため、すぐご案内できる可能性があります。",
+      title: "フリー案内できます",
+    };
+  } else if (activeSanmaTables.length >= 2 && sanmaStaffCount >= 2) {
+    free = {
+      activeSanmaTables: activeSanmaTables.length,
+      activeTables: activeTables.length,
       level: "possible",
-      message: "現在フリー卓は立っていません。メンバー2入りで立卓できる場合があります。",
-      title: "立卓できる場合あり",
+      message: "三麻2卓が進行中です。現在メンバー2入りです。LINEで一度ご確認ください。",
+      title: "入れる可能性あり",
     };
   } else {
     free = {
@@ -197,4 +221,10 @@ function staffCountInLatestLog(table: TableBundle) {
   const latestLog = [...table.logs].reverse().find((log) => log.started_at);
   if (!latestLog) return 0;
   return latestLog.seats.filter((seat) => seat.customer?.is_staff).length;
+}
+
+function customerCountInLatestLog(table: TableBundle) {
+  const latestLog = [...table.logs].reverse().find((log) => log.started_at);
+  if (!latestLog) return 0;
+  return latestLog.seats.filter((seat) => !seat.customer?.is_staff).length;
 }
