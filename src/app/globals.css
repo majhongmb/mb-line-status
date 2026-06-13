@@ -599,6 +599,31 @@ a { color: inherit; text-decoration: none; }
   font-weight: 900;
 }
 
+.reserve-label-text {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.reserve-required,
+.reserve-optional {
+  border-radius: 999px;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.reserve-required {
+  background: rgba(255, 200, 64, .18);
+  color: #ffd86b;
+}
+
+.reserve-optional {
+  background: rgba(255, 255, 255, .08);
+  color: rgba(240, 232, 208, .66);
+}
+
 .reserve-form input,
 .reserve-form select,
 .reserve-form textarea {
