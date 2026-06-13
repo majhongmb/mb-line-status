@@ -7,8 +7,10 @@ type Availability = {
   available: boolean;
   ledgerSetTableCount: number;
   maxTableCount: number;
+  message: string;
   remainingTableCount: number;
   reservedTableCount: number;
+  reservableDate: boolean;
   usedTableCount: number;
 };
 
@@ -29,7 +31,7 @@ const startTimeOptions = buildStartTimeOptions();
 
 const initialForm: FormState = {
   contact: "",
-  date: todayInputValue(),
+  date: tomorrowInputValue(),
   duration_minutes: "",
   email: "",
   game_type: "yonma",
@@ -120,7 +122,7 @@ export default function ReservePage() {
           <h1>予約フォーム</h1>
         </header>
 
-        <p className="reserve-notice">予約確定のご連絡をメールでお送りします。メールアドレスを入力できない場合は、お電話でご予約ください。</p>
+        <p className="reserve-notice">Web予約は翌日以降を受け付けています。当日のご予約はお電話またはLINEでお問い合わせください。予約確定のご連絡はメールでお送りします。</p>
 
         {submitted ? (
           <div className="reserve-complete" role="status">
@@ -131,7 +133,7 @@ export default function ReservePage() {
           <form className="reserve-form" onSubmit={submitReservation}>
             <label>
               <FieldLabel required>利用日</FieldLabel>
-              <input required type="date" value={form.date} onChange={(event) => update("date", event.target.value)} />
+              <input required min={tomorrowInputValue()} type="date" value={form.date} onChange={(event) => update("date", event.target.value)} />
             </label>
 
             <label>
@@ -187,9 +189,9 @@ export default function ReservePage() {
               ) : availabilityError ? (
                 availabilityError
               ) : availability ? (
-                availability.remainingTableCount > 0 && requestedTableCount <= availability.remainingTableCount
-                  ? `この日は予約可能です。残り${availability.remainingTableCount}卓です。`
-                  : "この日は満席です。別日または卓数を変更してください。"
+                availability.reservableDate && availability.remainingTableCount > 0 && requestedTableCount <= availability.remainingTableCount
+                  ? availability.message
+                  : availability.message || "この日は満席です。別日または卓数を変更してください。"
               ) : (
                 "利用日を選ぶと空き状況を確認できます。"
               )}
@@ -241,7 +243,7 @@ function availabilityStatusClass(availability: Availability | null, loading: boo
   if (loading) return "reserve-availability-checking";
   if (error) return "reserve-availability-error";
   if (!availability) return "reserve-availability-checking";
-  return availability.remainingTableCount > 0 && requestedTableCount <= availability.remainingTableCount
+  return availability.reservableDate && availability.remainingTableCount > 0 && requestedTableCount <= availability.remainingTableCount
     ? "reserve-availability-ok"
     : "reserve-availability-full";
 }
@@ -256,13 +258,15 @@ function buildStartTimeOptions() {
   return options;
 }
 
-function todayInputValue() {
+function tomorrowInputValue() {
   const now = new Date();
-  const japanDate = new Intl.DateTimeFormat("en-CA", {
+  const today = new Intl.DateTimeFormat("en-CA", {
     day: "2-digit",
     month: "2-digit",
     timeZone: "Asia/Tokyo",
     year: "numeric",
   }).format(now);
-  return japanDate;
+  const date = new Date(`${today}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + 1);
+  return date.toISOString().slice(0, 10);
 }
