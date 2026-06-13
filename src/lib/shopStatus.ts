@@ -173,7 +173,7 @@ function buildSetStatus(setTableCount: number | null): PublicStatus["set"] {
   if (setTableCount >= 2) {
     return {
       level: "full",
-      message: "現在セットは2卓入っています。空きがありません。",
+      message: "ただいま満席となっております。またのご利用をお待ちしております。",
       tableCount: 2,
       title: "セット空きなし",
     };
