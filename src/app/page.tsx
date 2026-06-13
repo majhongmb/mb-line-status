@@ -24,6 +24,7 @@ type Status = {
 };
 
 const fallbackError = "状況を確認できませんでした。LINEトークからお問い合わせください。";
+const shopPhoneHref = "tel:07090223436";
 
 export default function Home() {
   const [mode, setMode] = useState<Mode | null>(null);
@@ -111,8 +112,8 @@ export default function Home() {
                 <p>{selected.message}</p>
                 <div className="updated">更新 {status?.asOf}</div>
                 {mode === "set" && selected.level === "available" ? (
-                  <a className="reserve-link-button" href="/reserve">
-                    予約する
+                  <a className="reserve-link-button" href={shopPhoneHref}>
+                    電話で問い合わせる
                   </a>
                 ) : null}
                 <button className="close-button" onClick={closeOverlay} type="button">
