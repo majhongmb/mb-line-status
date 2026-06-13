@@ -73,6 +73,8 @@ export default function ReservePage() {
           <h1>予約フォーム</h1>
         </header>
 
+        <p className="reserve-notice">予約確定のご連絡をメールでお送りします。メールアドレスを入力できない場合は、お電話でご予約ください。</p>
+
         {submitted ? (
           <div className="reserve-complete" role="status">
             <strong>予約リクエストを受け付けました。</strong>
@@ -135,8 +137,8 @@ export default function ReservePage() {
             </label>
 
             <label>
-              <FieldLabel>メールアドレス</FieldLabel>
-              <input autoComplete="email" inputMode="email" type="email" value={form.email} onChange={(event) => update("email", event.target.value)} />
+              <FieldLabel required>メールアドレス</FieldLabel>
+              <input required autoComplete="email" inputMode="email" type="email" value={form.email} onChange={(event) => update("email", event.target.value)} />
             </label>
 
             <label className="reserve-full">

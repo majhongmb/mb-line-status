@@ -9,7 +9,7 @@ create table if not exists public.set_reservations (
   people_count integer check (people_count is null or people_count in (4, 5, 6)),
   customer_name text not null,
   contact text not null,
-  email text,
+  email text not null,
   notes text,
   status text not null default 'pending' check (status in ('pending', 'confirmed', 'cancelled')),
   created_at timestamptz not null default now(),
@@ -18,6 +18,9 @@ create table if not exists public.set_reservations (
 
 alter table public.set_reservations
   add column if not exists email text;
+
+alter table public.set_reservations
+  alter column email set not null;
 
 alter table public.set_reservations
   alter column people_count drop not null;

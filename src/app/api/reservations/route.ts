@@ -56,13 +56,14 @@ function parseReservation(body: ReservationRequest) {
   if (peopleCount !== null && !peopleCounts.has(peopleCount)) throw new Error("人数を選択してください。");
   if (!customerName) throw new Error("お名前を入力してください。");
   if (!contact) throw new Error("電話番号を入力してください。");
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("メールアドレスを確認してください。");
+  if (!email) throw new Error("メールアドレスを入力してください。");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("メールアドレスを確認してください。");
 
   return {
     contact,
     date,
     duration_minutes: durationMinutes,
-    email: email || null,
+    email,
     game_type: gameType,
     notes: notes || null,
     people_count: peopleCount,

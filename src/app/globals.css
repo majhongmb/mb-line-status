@@ -586,6 +586,18 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.15;
 }
 
+.reserve-notice {
+  margin: -6px 0 18px;
+  border: 1px solid rgba(237, 217, 90, .26);
+  border-radius: 10px;
+  background: rgba(200, 161, 32, .10);
+  color: rgba(240, 232, 208, .82);
+  padding: 11px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.65;
+}
+
 .reserve-form {
   display: grid;
   gap: 13px;
