@@ -182,7 +182,7 @@ function buildSetStatus(setTableCount: number | null): PublicStatus["set"] {
   if (setTableCount === 1) {
     return {
       level: "available",
-      message: "現在セットは1卓入っています。空きはありますが、ご来店前のご予約がおすすめです。",
+      message: "セットは1卓空きがあります。ご来店前のご予約がおすすめです。",
       tableCount: 1,
       title: "セット空きあります",
     };
