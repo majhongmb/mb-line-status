@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { assertReservationCapacity } from "@/lib/reservationAvailability";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import nodemailer from "nodemailer";
 
 export const dynamic = "force-dynamic";
 
@@ -76,6 +77,7 @@ function parseReservation(body: ReservationRequest) {
     customer_name: customerName,
     start_time: startTime,
     status: "pending",
+    source: "web",
     table_count: tableCount,
   };
 }
@@ -91,6 +93,92 @@ function isValidStartTime(value: string) {
   return totalMinutes >= 15 * 60 && totalMinutes <= 22 * 60 && minute % 15 === 0;
 }
 
-async function handleReservationAccepted(_reservation: ReturnType<typeof parseReservation>) {
-  // Later notification hooks live here: email, LINE, SMS, or webhook fan-out.
+async function handleReservationAccepted(reservation: ReturnType<typeof parseReservation>) {
+  try {
+    await sendShopNotificationEmail(reservation);
+  } catch (caught) {
+    console.error("Failed to send shop reservation notification", caught);
+  }
+}
+
+async function sendShopNotificationEmail(reservation: ReturnType<typeof parseReservation>) {
+  const user = process.env.GMAIL_USER;
+  const appPassword = process.env.GMAIL_APP_PASSWORD;
+  const to = process.env.SHOP_RESERVATION_NOTIFICATION_EMAIL || "hiroki.university.f.edu@gmail.com";
+  if (!user || !appPassword) throw new Error("Gmail notification settings are missing.");
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { pass: appPassword, user },
+  });
+  const content = shopNotificationContent(reservation);
+  await transporter.sendMail({
+    from: process.env.RESERVATION_FROM_EMAIL || `麻雀MB <${user}>`,
+    html: content.html,
+    subject: content.subject,
+    text: content.text,
+    to,
+  });
+}
+
+function shopNotificationContent(reservation: ReturnType<typeof parseReservation>) {
+  const subject = "【麻雀MB】新しい予約リクエストがあります";
+  const rows = [
+    ["利用日", formatDate(reservation.date)],
+    ["開始時間", reservation.start_time],
+    ["種目", gameTypeLabel(reservation.game_type)],
+    ["卓数", `${reservation.table_count}卓`],
+    ["人数", peopleLabel(reservation.people_count)],
+    ["利用時間", durationLabel(reservation.duration_minutes)],
+    ["名前", reservation.customer_name],
+    ["電話", reservation.contact],
+    ["メール", reservation.email],
+    ["備考", reservation.notes || "なし"],
+  ];
+  const text = [
+    "新しい予約リクエストが入りました。",
+    "",
+    ...rows.map(([label, value]) => `${label}: ${value}`),
+    "",
+    "帳簿アプリの予約タブで確認してください。",
+  ].join("\n");
+  const html = `<!doctype html>
+<html lang="ja">
+  <body style="margin:0;padding:0;background:#f6f7f9;color:#1f2937;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.7;">
+    <div style="max-width:640px;margin:0 auto;padding:24px 16px;">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;padding:24px;">
+        <h1 style="margin:0 0 16px;font-size:20px;">新しい予約リクエスト</h1>
+        <table style="width:100%;border-collapse:collapse;background:#f9fafb;border-radius:8px;overflow:hidden;">
+          <tbody>${rows.map(([label, value]) => `<tr><th style="width:120px;text-align:left;padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#4b5563;font-weight:700;">${escapeHtml(label)}</th><td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;font-weight:700;">${escapeHtml(value)}</td></tr>`).join("")}</tbody>
+        </table>
+        <p style="margin:18px 0 0;">帳簿アプリの予約タブで確認してください。</p>
+      </div>
+    </div>
+  </body>
+</html>`;
+  return { html, subject, text };
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("ja-JP", { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00.000Z`));
+}
+
+function gameTypeLabel(value: string) {
+  if (value === "sanma") return "三麻";
+  if (value === "yonma") return "四麻";
+  return "その他";
+}
+
+function peopleLabel(value: number | null) {
+  if (!value) return "未定";
+  return value >= 6 ? "6人以上" : `${value}人`;
+}
+
+function durationLabel(value: number | null) {
+  if (!value) return "未定";
+  return `${value / 60}時間`;
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }

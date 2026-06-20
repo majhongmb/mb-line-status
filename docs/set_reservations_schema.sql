@@ -8,11 +8,14 @@ create table if not exists public.set_reservations (
   duration_minutes integer check (duration_minutes is null or duration_minutes in (180, 240, 300)),
   people_count integer check (people_count is null or people_count in (4, 5, 6)),
   table_count integer not null default 1 check (table_count in (1, 2)),
+  confirmation_email_sent_at timestamptz,
+  cancellation_email_sent_at timestamptz,
   customer_name text not null,
   contact text not null,
   email text not null,
   notes text,
   status text not null default 'pending' check (status in ('pending', 'confirmed', 'cancelled')),
+  source text not null default 'web' check (source in ('web', 'manual')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -32,6 +35,21 @@ alter table public.set_reservations
 
 alter table public.set_reservations
   add column if not exists table_count integer not null default 1;
+
+alter table public.set_reservations
+  add column if not exists confirmation_email_sent_at timestamptz;
+
+alter table public.set_reservations
+  add column if not exists cancellation_email_sent_at timestamptz;
+
+alter table public.set_reservations
+  add column if not exists source text not null default 'web';
+
+alter table public.set_reservations
+  drop constraint if exists set_reservations_source_check;
+
+alter table public.set_reservations
+  add constraint set_reservations_source_check check (source in ('web', 'manual'));
 
 alter table public.set_reservations
   drop constraint if exists set_reservations_table_count_check;
