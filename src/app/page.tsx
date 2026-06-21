@@ -63,7 +63,11 @@ export default function Home() {
   return (
     <main className="status-page">
       <header className="brand-header">
-        <img alt="麻雀MB" className="brand-badge-image" src="/mb-title-badge.svg" />
+        <span className="brand-mark">MB</span>
+        <span className="brand-copy">
+          <span className="brand-name">麻雀MB</span>
+          <span className="brand-sub">卓状況</span>
+        </span>
       </header>
 
       <section className="button-stack" aria-label="卓状況の確認">
