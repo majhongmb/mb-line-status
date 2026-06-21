@@ -99,6 +99,12 @@ async function handleReservationAccepted(reservation: ReturnType<typeof parseRes
   } catch (caught) {
     console.error("Failed to send shop reservation notification", caught);
   }
+
+  try {
+    await sendShopLineNotification(reservation);
+  } catch (caught) {
+    console.error("Failed to send shop LINE reservation notification", caught);
+  }
 }
 
 async function sendShopNotificationEmail(reservation: ReturnType<typeof parseReservation>) {
@@ -157,6 +163,46 @@ function shopNotificationContent(reservation: ReturnType<typeof parseReservation
   </body>
 </html>`;
   return { html, subject, text };
+}
+
+async function sendShopLineNotification(reservation: ReturnType<typeof parseReservation>) {
+  const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+  const to = process.env.LINE_RESERVATION_NOTIFY_TO;
+  if (!token || !to) return;
+
+  const message = [
+    "【麻雀MB】新しい予約リクエスト",
+    "",
+    `利用日: ${formatDate(reservation.date)}`,
+    `開始時間: ${reservation.start_time}`,
+    `種目: ${gameTypeLabel(reservation.game_type)}`,
+    `卓数: ${reservation.table_count}卓`,
+    `人数: ${peopleLabel(reservation.people_count)}`,
+    `利用時間: ${durationLabel(reservation.duration_minutes)}`,
+    `名前: ${reservation.customer_name}`,
+    `電話: ${reservation.contact}`,
+    `メール: ${reservation.email}`,
+    `備考: ${reservation.notes || "なし"}`,
+    "",
+    "帳簿アプリの予約タブで確認してください。",
+  ].join("\n");
+
+  const response = await fetch("https://api.line.me/v2/bot/message/push", {
+    body: JSON.stringify({
+      messages: [{ text: message, type: "text" }],
+      to,
+    }),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`LINE push failed: ${response.status} ${body}`);
+  }
 }
 
 function formatDate(value: string) {
