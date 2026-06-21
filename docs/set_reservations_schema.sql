@@ -78,6 +78,34 @@ create index if not exists set_reservations_date_start_time_idx
 create index if not exists set_reservations_status_date_idx
   on public.set_reservations(status, date);
 
+create table if not exists public.set_reservation_blocked_dates (
+  date date primary key,
+  reason text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+drop trigger if exists set_reservation_blocked_dates_set_updated_at on public.set_reservation_blocked_dates;
+create trigger set_reservation_blocked_dates_set_updated_at
+before update on public.set_reservation_blocked_dates
+for each row execute function public.set_updated_at();
+
+alter table public.set_reservation_blocked_dates enable row level security;
+
+drop policy if exists "anon read set_reservation_blocked_dates" on public.set_reservation_blocked_dates;
+create policy "anon read set_reservation_blocked_dates"
+on public.set_reservation_blocked_dates for select to anon
+using (true);
+
+drop policy if exists "authenticated manage set_reservation_blocked_dates" on public.set_reservation_blocked_dates;
+create policy "authenticated manage set_reservation_blocked_dates"
+on public.set_reservation_blocked_dates for all to authenticated
+using (true)
+with check (true);
+
+grant select on public.set_reservation_blocked_dates to anon;
+grant select, insert, update, delete on public.set_reservation_blocked_dates to authenticated;
+
 alter table public.set_reservations enable row level security;
 
 drop policy if exists "anon insert set_reservations" on public.set_reservations;

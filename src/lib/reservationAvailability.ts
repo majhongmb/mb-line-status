@@ -33,6 +33,29 @@ export async function loadReservationAvailability(supabase: SupabaseServerClient
     };
   }
 
+  const { data: blockedDate, error: blockedDateError } = await supabase
+    .from("set_reservation_blocked_dates")
+    .select("reason")
+    .eq("date", date)
+    .maybeSingle();
+
+  if (blockedDateError) throw blockedDateError;
+
+  if (blockedDate) {
+    const reason = typeof blockedDate.reason === "string" ? blockedDate.reason.trim() : "";
+    return {
+      available: false,
+      date,
+      ledgerSetTableCount: 0,
+      maxTableCount: maxSetTableCount,
+      message: reason ? `この日は予約受付を停止しています。${reason}` : "この日は予約受付を停止しています。別日をお選びください。",
+      remainingTableCount: 0,
+      reservedTableCount: 0,
+      reservableDate: false,
+      usedTableCount: maxSetTableCount,
+    };
+  }
+
   const { data: reservations, error: reservationError } = await supabase
     .from("set_reservations")
     .select("table_count, status")

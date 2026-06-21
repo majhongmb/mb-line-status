@@ -126,8 +126,9 @@ export default function ReservePage() {
 
         {submitted ? (
           <div className="reserve-complete" role="status">
-            <strong>予約リクエストを受け付けました。</strong>
-            <span>確定連絡をお待ちください。</span>
+            <strong>まだ予約は確定していません。</strong>
+            <span>予約リクエストを受け付けました。お店で内容を確認後、予約確定メールをお送りします。</span>
+            <span>確定メールが届くまでは仮受付です。お急ぎの場合は営業時間内にお電話、営業時間外は公式LINEからお問い合わせください。</span>
           </div>
         ) : (
           <form className="reserve-form" onSubmit={submitReservation}>
