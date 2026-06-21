@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       userId: event.source?.userId,
     });
 
-    if (token && event.replyToken && event.replyToken !== "00000000000000000000000000000000") {
+    if (shouldReplyWithLineSourceId() && token && event.replyToken && event.replyToken !== "00000000000000000000000000000000") {
       await replyLineMessage(token, event.replyToken, [
         "麻雀MBの予約通知先IDです。",
         "",
@@ -64,6 +64,10 @@ function isValidLineSignature(bodyText: string, signature: string | null) {
   const expected = Buffer.from(digest);
   const actual = Buffer.from(signature);
   return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+}
+
+function shouldReplyWithLineSourceId() {
+  return process.env.LINE_WEBHOOK_SETUP_REPLY_ENABLED === "true";
 }
 
 async function replyLineMessage(token: string, replyToken: string, text: string) {
